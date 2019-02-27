@@ -31,6 +31,13 @@ class List(list):
             if not (element in elements):
                 self.removeall(element)
 
+    def whipe(self):
+        accumulator=[]
+        for e in self:
+            accumulator+=e
+        return accumulator
+
+
 
 
 
@@ -86,12 +93,41 @@ class Str(str):
     def __isub__(self,element):
         self.replace(element,"")
 
-    def __truediv__(self,element):
-        self.replace(element,"")
+    def __truediv__(self,elements):
+        for element in elements:
+            self.replace(element,"")
 
     def __floordiv__(self,element):
-        while element in self:
-            self.replace(element,"")
+        for element in elements:
+            self.removeall(element,"")
+
+    def decompose(self):
+        accumulator=[]
+        for i in range(1,len(self)):
+            for j in range(len(self)-i):
+                accumulator.append(self[j:j+i])
+        return accumulator
+
+    def union(self,l1,l2):
+        accumulator=[]
+        for e1 in l1:
+            if e1 in l2:
+                accumulator.append(e1)
+        return set(accumulator)
+
+    def __mod__(self,other):
+        other=Str(other)
+        own_dec=self.decompose()
+        other_dec=other.decompose()
+        result=len(self.union(own_dec,other_dec))/len(own_dec+other_dec)*100
+        return result #in [0,1]
+
+
+
+    def reverse(self):
+        data=list(self)
+        data.reverse()
+        return Str("".join(data))
 
 
 
@@ -111,6 +147,13 @@ class Sentence(Str):
         words.removeall('')
         words=[Word(word) for word in words]
         return words
+
+    def __mod__(self,other):
+        other=Sentence(other)
+        own_dec=self.wordsplit()
+        other_dec=other.wordsplit()
+        result=len(self.union(own_dec,other_dec))/len(own_dec+other_dec)*100
+        return result #in [0,1]
 
 
 
@@ -183,18 +226,25 @@ noun={"nature":None,
 if __name__=="__main__":
 
     sentence=Sentence("you're a fucking asshole you dumbass, you are a scrotumbag")
-    b=Str([1,2])
+    #b=Str([1,2])
     #a=a.remove(".")
     #print(a)
-    print(sentence.words)
-    print([word.syllables for word in sentence.words])
-    print(sentence-"fucking ")
-    sentence=MutableString(sentence)
-    print(sentence)
-    print(sentence.append("Wesh negro"))
+    #print(sentence.words)
+    #print([word.syllables for word in sentence.words])
+    #print(sentence-"fucking ")
+    #sentence=MutableString(sentence)
+    #print(sentence)
+    #sentence.append(" Wesh negro")
+    #print(Str(sentence).title())
     #print(list(a))
     #print(a.remove("s"))
     #print(b.remove(1))
+    other=Sentence("you are a fucking asshole and a dumbass")
+    other.words.reverse()
+    other=Sentence(" ".join(other.words))
+    #other=other.reverse()
+    print(other)
+    print(sentence%a)
 
 
     #def decomposeSentence(Str):
