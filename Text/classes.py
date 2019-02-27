@@ -152,7 +152,10 @@ class Sentence(Str):
         other=Sentence(other)
         own_dec=self.wordsplit()
         other_dec=other.wordsplit()
-        result=len(self.union(own_dec,other_dec))/len(own_dec+other_dec)*100
+        print(own_dec,other_dec)
+        union=self.union(own_dec,other_dec)
+        print(union)
+        result=len(union)/len(own_dec+other_dec)*100
         return result #in [0,1]
 
 
@@ -234,7 +237,7 @@ if __name__=="__main__":
     #print(sentence-"fucking ")
     #sentence=MutableString(sentence)
     #print(sentence)
-    #sentence.append(" Wesh negro")
+    #sentence.append(" enorme test")
     #print(Str(sentence).title())
     #print(list(a))
     #print(a.remove("s"))
@@ -244,7 +247,7 @@ if __name__=="__main__":
     other=Sentence(" ".join(other.words))
     #other=other.reverse()
     print(other)
-    print(sentence%a)
+    print(sentence%other)
 
 
     #def decomposeSentence(Str):
