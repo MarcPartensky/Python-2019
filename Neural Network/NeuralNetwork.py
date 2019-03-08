@@ -2,6 +2,8 @@ import numpy as np
 
 picture=np.random.randn(28,28)
 
+#import input_data
+
 class NeuralNetwork:
     def __init__(self,sizes=[784,784,28,10]):
         """Create a neural network using list of sizes."""
@@ -12,8 +14,8 @@ class NeuralNetwork:
 
     def evaluate(self,test_data):
         """Return number of successful predictions using test_datas list."""
-        results=[(np.argmax(self.predict(x)),y]) for (x,y) in test_data]
-        return sum(int(x==y) for (x,y) in results])
+        results=[(np.argmax(self.predict(x)),y) for (x,y) in test_data]
+        return sum([int(x==y) for (x,y) in results])
 
     def predict(self,input):
         """Return predictions for given input."""
@@ -59,7 +61,7 @@ class NeuralNetwork:
             weighted.append(z)
             x=sigmoid(z)
             activations.append(x)
-        
+
 
 
         return dB,dW

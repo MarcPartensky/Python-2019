@@ -237,7 +237,6 @@ if __name__=="__main__":
     #print(sentence-"fucking ")
     #sentence=MutableString(sentence)
     #print(sentence)
-    #sentence.append(" enorme test")
     #print(Str(sentence).title())
     #print(list(a))
     #print(a.remove("s"))

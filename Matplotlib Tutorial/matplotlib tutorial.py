@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 import csv
 import numpy as np
 
+import urllib
+import matplotlib.dates as mdates
+
+import sys
+print(sys.version)
+
 
 """
 x=[1,2,3]
@@ -88,14 +94,53 @@ x,y=np.loadtxt("text.txt",delimiter=",",unpack=True)
 plt.plot(x,y,label="loaded from file")
 """
 
+def bytespdate2num(fmt,encoding="utf-8"):
+    strconverter=mdates.strpdate2num(fmt)
+    def bytesconverter(b):
+        s=b.decode(encoding)
+        return strconverter(s)
+    return bytesconverter
+
 
 
 def graph_data(stock):
 
+    #fig=plt.figure()
+    #ax1=plt.subplot2grid((1,1),(0,0))
+
     stock_price_url = 'https://pythonprogramming.net/yahoo_finance_replacement'
-    
-    plt.xlabel("x")
-    plt.ylabel("y")
+
+    source_code=urllib.request.urlopen(stock_price_url).read().decode()
+    #print(source_code)
+    stock_data=[]
+    split_source=source_code.split('\n')
+
+    for line in split_source:
+        split_line=line.split(",")
+        if len(split_line)==6:
+            if 'values' not in line and 'labels' not in line:
+                stock_data.append(line)
+
+    date,closep,highp,lowp,openp,volume=np.loadtxt(stock_data,
+                                             delimiter=",",
+                                             unpack=True,
+                                             #%Y=full year
+                                             #%y=partial year
+                                             #%m=number month
+                                             #%d=day
+                                             #%H=hours
+                                             #%M=minutes
+                                             #%S=seconds
+                                             #%m-%d-%Y
+                                             #converters={0: bytespdate2num('%Y%m%d')})
+                                             converters={0: lambda s : mdates.date2num(datetime.strptime(s.decode("utf-8"),'%Y%m%d'))})
+
+    plt.plot_date(date,closep,"-")
+
+
+
+    plt.xlabel("date")
+    plt.ylabel("price")
     plt.title("Interesting graph\nCheck it out!")
     plt.legend()
     plt.show()
