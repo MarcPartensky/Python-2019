@@ -11,10 +11,17 @@ Features:
 9: factoriser #renvoie str ou liste de liste des coefficients "pareil"
 10: racines reelles #renvoie liste des racines reelles
 11: racines complexes #renvoie liste des racines complexes
+12: Decomposition en éléments simples
 12: show #Affiche le polynome sur une fenetre pygame, pyglet ou matplotlib
 """
 
 from copy import deepcopy
+from mymaths.infinity import Infinity
+from mymaths.limit import lim
+import matplotlib.pyplot as plt
+
+from mygrapher.grapher import Grapher
+from mygrapher.mycolors import *
 
 
 class Polynomial:
@@ -43,11 +50,13 @@ class Polynomial:
 
     def __add__(self, other):
         """Add 2 polynomials together by adding their coefficients."""
-        maxdegree = max(self.degree(),other.degree())
+        maxdegree = max(self.degree()+1,other.degree()+1)
         cA = self.adapt(self.coefficients,maxdegree)
         cB = self.adapt(other.coefficients,maxdegree)
         newcoefficients = [a+b for (a,b) in zip(cA, cB)]
-        return Polynomial(newcoefficients)
+        A=Polynomial(newcoefficients)
+        A.correct()
+        return A
 
     def __sub__(self, other):
         """Substract 2 polynomials together by multiplying the second polynomial by -1 and adding it to the first using add method."""
@@ -143,8 +152,6 @@ class Polynomial:
         R0.correct()
         R1.correct()
         listR=[R0,R1]
-        R2,Q2=R0/R1
-        listR.append(R2)
         while listR[-1].degree()>0:
             R,Q=listR[-2]/listR[-1]
             listR.append(R)
@@ -177,8 +184,6 @@ class Polynomial:
             C[-1] = R[-1]/B[-1]
             R = R-B*C
             Q = Q+C
-            Q.correct()
-            R.correct()
         return [R,Q]
 
         #Ce que j'ai du faire pour trouver l'implementation...
@@ -190,6 +195,94 @@ class Polynomial:
         #[4,5]
 
         #5=8*0+5 cas particulier de la division euclidienne
+
+    def __call__(self,x):
+        """Evaluate the polynomial given an x value."""
+        sum=0
+        for n,c in enumerate(self.coefficients):
+            sum+=c*x**n
+        return sum
+
+    def getTrivialRoots(self):
+        """Return the list of trivial roots found."""
+        l=[]
+        for e in range(-10,11,1):
+            if self(e)==0:
+                l.append(e)
+        return l
+
+    def roots(self):
+        """Return the list of all the roots of the polynomial."""
+        #print("Trivial Roots:",self.getTrivialRoots())
+        B=deepcopy(A)
+        derivatives=[deepcopy(A)]
+        roots=[]
+        while B.degree()>1:
+            B.derivate()
+            derivatives.append(deepcopy(B))
+        print(derivatives)
+        derivatives.reverse()
+        oldextrema=[]
+        for derivative in derivatives:
+            newextrema=[]
+            neglim=lim(derivative,-Infinity())
+            poslim=lim(derivative,Infinity())
+            if type(neglim)==Infinity:
+                neglim=~neglim
+            if type(poslim)==Infinity:
+                poslim=~poslim
+            extrema=[neglim]+oldextrema+[poslim]
+            for i in range(len(extrema)-1):
+                print("extrema:",extrema[i],extrema[i+1])
+                print("derivatives:",derivative(extrema[i]),derivative(extrema[i+1]))
+                print("")
+                if derivative(extrema[i])*derivative(extrema[i+1])<=0:
+                    newextrema.append(derivative.gradientDescent(extrema[i],extrema[i+1]))
+            print("newextrema:",newextrema)
+            print("")
+            print("")
+            oldextrema=newextrema[:]
+        return newextrema
+
+
+
+    def gradientDescent(self,a,b,precision=10e-10):
+        """Return a int value x between a and b for which the polynomial canceled itself."""
+        print("descent",self(a),self(b))
+        if (self(a)>0 and self(b)>0) or (self(a)<0 and self(b)<0):
+            raise Exception("The polynomial cannot cancel itself within this interval.")
+            return None
+        if a>b:
+            c=a
+            a=b
+            b=c
+        x=(a+b)/2
+        while abs(self(x))>precision:
+            print("descending:",x,self(x))
+            if self(x)>0:
+                b=x
+            if self(x)<0:
+                a=x
+            x=(a+b)/2
+        return x
+
+
+    def _floordiv__(self,other):
+        """Return a string of the decomposition in simple elements of the polynomial."""
+        pass
+
+    def show(self,zone=[-5,5],precision=0.1):
+        """Show the polynomial using matplotlib."""
+        Grapher([self])()
+        """
+        z,Z=zone
+        X=list([precision*x for x in range(int(z/precision),int(Z/precision))])
+        Y=list([self(x) for x in X])
+        plt.plot(X,Y,label="Polynomial")
+        plt.show()
+
+        print("executed")
+        """
 
 
 if __name__ == "__main__":
@@ -206,6 +299,9 @@ if __name__ == "__main__":
     print("A*B =",A*B)
     print("Derivative of A =",A.derivative())
     print("A/B :",A/B)
-    print("Unit polynomial of C =",A.unit())
+    print("Unit polynomial of C =",C.unit())
     print("HCF (PGCD en francais) of A and B (written A^B) =",A^B)
     print("LCM (PPCM en francais) of A and B (written A|B) =",A|B)
+    #print(A.gradientDescent(-10,10))
+    print(A.roots())
+    A.show()
