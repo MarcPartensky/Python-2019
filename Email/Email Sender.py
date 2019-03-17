@@ -1,7 +1,6 @@
 import smtplib
 import credentials
 
-
 def send_email(subject, msg, receiver):
     try:
         server=smtplib.SMTP('smtp.gmail.com:587')
@@ -17,7 +16,7 @@ def send_email(subject, msg, receiver):
 
 
 subject = "Test"
-msg = "Je pratique le test de l'envoie de mail automatique par python et tu es mon cobaye."
-receiver="alexandre.bigot@gmail.com"
+msg = "je test ta patience"
+receiver="valentin.colin78@gmail.com"
 
 send_email(subject, msg, receiver)
