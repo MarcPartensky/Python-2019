@@ -42,7 +42,6 @@ class Infinity:
     def __mul__(self,other):
         if other==0:
             raise Exception("Undetermined")
-            return None
         else:
             if sign(other)!=sign(self):
                 return Infinity(0)
@@ -51,7 +50,6 @@ class Infinity:
     def __truediv__(self,other):
         if type(other)==Infinity:
             raise Exception("Undetermined")
-            return None
         else:
             if sign(other)!=sign(self):
                 return Infinity(0)

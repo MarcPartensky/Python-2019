@@ -8,7 +8,6 @@ from copy import deepcopy
 def pgcd(a,b):
 	t = b
 	b = a % b
-
 	if b == 0:
 		return t
 	else:
@@ -71,7 +70,7 @@ def pgcdl(l):
 
 
 if __name__=="__main__":
-    c=5 #taille de la matrice carre de depart
+    c=6 #taille de la matrice carre de depart
     a=np.array([[random.randint(0,10) for i in range(c)] for j in range(c)])
     print(a)
     b=triangular(a)

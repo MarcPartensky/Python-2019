@@ -16,18 +16,18 @@ Features:
 """
 
 from copy import deepcopy
-from mymaths.infinity import Infinity
-from mymaths.limit import lim
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt #Old way to show the polynome on screen. Not very nice though...
 
-from mygrapher.grapher import Grapher
-from mygrapher.mycolors import *
+from mygrapher.grapher import Grapher #Used to show the polynome on screen with the ability to move within it.
+
+import random #Used only to generate random polynomes.
 
 
 class Polynomial:
     def __init__(self, coefficients):
         """Create a polynomial using its coefficients."""
         self.coefficients = coefficients
+        self.definition=[-10**20,10**20]
     def __repr__(self):
         """Return the usual representation of a polynomial."""
         if self.coefficients==[]:
@@ -203,65 +203,48 @@ class Polynomial:
             sum+=c*x**n
         return sum
 
-    def getTrivialRoots(self):
-        """Return the list of trivial roots found."""
-        l=[]
-        for e in range(-10,11,1):
-            if self(e)==0:
-                l.append(e)
-        return l
-
-    def roots(self):
-        """Return the list of all the roots of the polynomial."""
-        #print("Trivial Roots:",self.getTrivialRoots())
-        B=deepcopy(A)
-        derivatives=[deepcopy(A)]
-        roots=[]
+    def allDerivatives(self):
+        """Return the list of all derivatives of the polynome until the zero polynome."""
+        B=deepcopy(self)
+        derivatives=[deepcopy(self)]
         while B.degree()>1:
             B.derivate()
             derivatives.append(deepcopy(B))
+        return derivatives
+
+    def roots(self):
+        """Return the list of all the roots of the polynomial."""
+        """Does that by finding where all the derivates cancel, to find new extrema and applying tvi."""
+        roots=[]
+        derivatives=self.allDerivatives()
         print(derivatives)
         derivatives.reverse()
-        oldextrema=[]
+        old_extrema=[]
         for derivative in derivatives:
-            newextrema=[]
-            neglim=lim(derivative,-Infinity())
-            poslim=lim(derivative,Infinity())
-            if type(neglim)==Infinity:
-                neglim=~neglim
-            if type(poslim)==Infinity:
-                poslim=~poslim
-            extrema=[neglim]+oldextrema+[poslim]
+            new_extrema=[]
+            neglim=self.definition[0]
+            poslim=self.definition[1]
+            extrema=[neglim]+old_extrema+[poslim]
             for i in range(len(extrema)-1):
-                print("extrema:",extrema[i],extrema[i+1])
-                print("derivatives:",derivative(extrema[i]),derivative(extrema[i+1]))
-                print("")
                 if derivative(extrema[i])*derivative(extrema[i+1])<=0:
-                    newextrema.append(derivative.gradientDescent(extrema[i],extrema[i+1]))
-            print("newextrema:",newextrema)
-            print("")
-            print("")
-            oldextrema=newextrema[:]
-        return newextrema
+                    new_extrema.append(derivative.gradientDescent(extrema[i],extrema[i+1]))
+            old_extrema=new_extrema[:]
+        return new_extrema
 
 
 
-    def gradientDescent(self,a,b,precision=10e-10):
-        """Return a int value x between a and b for which the polynomial canceled itself."""
-        print("descent",self(a),self(b))
-        if (self(a)>0 and self(b)>0) or (self(a)<0 and self(b)<0):
+    def gradientDescent(self,xa,xb,precision=10e-10):
+        """Return a float value x between a and b for which the polynomial canceled itself."""
+        """Does that based on theoreme of intermediate value with dichotomy."""
+        if self(xa)*self(xb)>0:
             raise Exception("The polynomial cannot cancel itself within this interval.")
-            return None
-        if a>b:
-            c=a
-            a=b
-            b=c
+        a=min(xa,xb)
+        b=max(xa,xb)
         x=(a+b)/2
         while abs(self(x))>precision:
-            print("descending:",x,self(x))
-            if self(x)>0:
+            if self(x)*self(b)>0:
                 b=x
-            if self(x)<0:
+            if self(x)*self(a)>0:
                 a=x
             x=(a+b)/2
         return x
@@ -271,21 +254,21 @@ class Polynomial:
         """Return a string of the decomposition in simple elements of the polynomial."""
         pass
 
-    def show(self,zone=[-5,5],precision=0.1):
-        """Show the polynomial using matplotlib."""
-        Grapher([self])()
-        """
+    def show(self):
+        """Show the polynomial with grapher."""
+        Grapher([self])() #Instance Grapher only takes the list of the functions in parameter and can be called to display them.
+
+    def matplotlibShow(self,zone=[-5,5],precision=0.1):
+        """Show the polynomial with matplotlib using optional zone and precision."""
         z,Z=zone
         X=list([precision*x for x in range(int(z/precision),int(Z/precision))])
         Y=list([self(x) for x in X])
         plt.plot(X,Y,label="Polynomial")
         plt.show()
 
-        print("executed")
-        """
-
-
 if __name__ == "__main__":
+    #suite_random = [random.randint(0,10) for i in range(10)] #Create polynome as big as needed.
+    #X=Polynomial(suite_random)
     suite1 = [3,2,4,5,1]
     suite2 = [1,4,1]
     suite3 = [4,5]
@@ -302,6 +285,6 @@ if __name__ == "__main__":
     print("Unit polynomial of C =",C.unit())
     print("HCF (PGCD en francais) of A and B (written A^B) =",A^B)
     print("LCM (PPCM en francais) of A and B (written A|B) =",A|B)
-    #print(A.gradientDescent(-10,10))
-    print(A.roots())
+    print("Roots of A:",A.roots())
+    print("Show A on screen:")
     A.show()
