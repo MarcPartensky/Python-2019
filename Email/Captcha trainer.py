@@ -24,7 +24,7 @@ def searchCaptcha(filename):
             X=x-234
             Y=y+34
             return [X,Y]
-    return None
+    raise Exception("No captcha was found in this picture.")
 
 
 def resolveCaptcha(url):
