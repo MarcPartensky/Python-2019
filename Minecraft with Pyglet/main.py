@@ -89,27 +89,32 @@ class Window(pyglet.window.Window):
     lock = False; mouse_lock = property(lambda self:self.lock,setLock)
 
     def __init__(self,*args,**kwargs):
+        """Create pyglet window."""
         super().__init__(*args,**kwargs)
         self.set_minimum_size(300,200)
         self.keys = key.KeyStateHandler()
         self.push_handlers(self.keys)
         pyglet.clock.schedule(self.update)
 
-        self.model = Model()
-        self.player = Player((0.5,1.5,1.5),(-30,0))
+        self.model=Model()
+        self.player=Player((0.5,1.5,1.5),(-30,0))
 
     def on_mouse_motion(self,x,y,dx,dy):
+        """Set the parameters of the view of the player using the position of the mouse."""
         if self.mouse_lock: self.player.mouse_motion(dx,dy)
 
     def on_key_press(self,KEY,MOD):
+        """Determine if the window must be closed."""
         if KEY == key.ESCAPE: self.close()
         #elif KEY == key.E: self.mouse_lock = not self.mouse_lock
         self.mouse_lock=True
 
     def update(self,dt):
+        """Update the player's view using time dt and knowning keys."""
         self.player.update(dt,self.keys)
 
     def on_draw(self):
+        """Overload function automatically called by the pyglet window while running."""
         self.clear()
         self.set3d()
         self.push(self.player.pos,self.player.rot)
@@ -119,7 +124,9 @@ class Window(pyglet.window.Window):
 
 if __name__ == '__main__':
     window = Window(width=1440,height=900,caption='Minecraft',fullscreen=True)
-    glClearColor(0.5,0.7,1,1)
-    glEnable(GL_DEPTH_TEST)
+    r,g,b,alpha=0,0,0,1 #Color of the background and transparency alpha, each component's value must be between 0 and 1
+    glClearColor(r,g,b,alpha) #Apply the background
+    #glEnable allows to change the parameters of the opengl interface
+    glEnable(GL_DEPTH_TEST) #Allow the objects not to be displayed when behing others, must be enabled to prevent weird bugs
     #glEnable(GL_CULL_FACE)
     pyglet.app.run()

@@ -9,7 +9,3 @@ config.sample_buffers
 
 
 platform = pyglet.window.get_platform()
-display = platform.get_default_display()
-
-for screen in display.get_screens():
-    print(screen)

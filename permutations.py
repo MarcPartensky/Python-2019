@@ -13,7 +13,7 @@ def permutations(l):
         for i in range(len(l)):
             b=l[:]
             del b[i]
-            result+=[tuple(l[i])+a for a in permutations(b)]
+            result+=[tuple([l[i]])+a for a in permutations(b)]
         return result
 
 def prod(l):
@@ -32,9 +32,10 @@ print(facto(10))
 
 def getPermutation(l,n):
     """Return the permutation number n."""
-    for n i
+    pass
 
 
+print(permutations(list(range(5))))
 
 
 
