@@ -2,6 +2,58 @@ from pyglet.gl import *
 from pyglet.window import key
 
 import numpy as np
+import math
+
+
+verticies = (
+    (1, -1, -1),
+    (1, 1, -1),
+    (-1, 1, -1),
+    (-1, -1, -1),
+    (1, -1, 1),
+    (1, 1, 1),
+    (-1, -1, 1),
+    (-1, 1, 1)
+    )
+
+edges = (
+    (0,1),
+    (0,3),
+    (0,4),
+    (2,1),
+    (2,3),
+    (2,7),
+    (6,3),
+    (6,4),
+    (6,7),
+    (5,1),
+    (5,4),
+    (5,7)
+    )
+
+surfaces = (
+    (0,1,2,3),
+    (3,2,7,6),
+    (6,7,5,4),
+    (4,5,1,0),
+    (1,5,7,2),
+    (4,0,3,6)
+    )
+
+colors = (
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (0,1,0),
+    (1,1,1),
+    (0,1,1),
+    (1,0,0),
+    (0,1,0),
+    (0,0,1),
+    (1,0,0),
+    (1,1,1),
+    (0,1,1),
+    )
 
 BLACK   = (  0,  0,  0)
 WHITE   = (255,255,255)
@@ -10,6 +62,16 @@ GREEN   = (  0,255,  0)
 YELLOW  = (255,255,  0)
 BLUE    = (  0,  0,255)
 ORANGE  = (200,100,  0)
+
+
+BLACK  = (0,0,0)
+WHITE  = (1,1,1)
+RED    = (1,0,0)
+GREEN  = (0,1,0)
+BLUE   = (0,0,1)
+YELLOW = (1,1,0)
+ORANGE = (0.8,0.5,0)
+
 
 class Window(pyglet.window.Window):
     def __init__(self,*args,**kwargs):
@@ -22,6 +84,7 @@ class Window(pyglet.window.Window):
         self.zFar=1000 #distance of the viewer from the far clipping plane because the rays cannot reach infinity
         self.keys = key.KeyStateHandler() #Create an object of the pyglet key type for event detection
         self.push_handlers(self.keys) #Allow automatic update of the keys of the window each turn
+        pyglet.clock.schedule(self.update)
         self.mouse_lock=True #Lock the mouse for further player controls
         self.rubiks_cube=RubiksCube() #Rubiks cube to play with
         #pyglet.clock.schedule(self.update) #Set the clock for loop turns using pyglet update attribute
@@ -34,6 +97,13 @@ class Window(pyglet.window.Window):
         self.push(self.player.position,self.player.rotation) #Apply the matrix operations to set the world's position
         self.rubiks_cube.draw() #Load the matrix on the buffer
         glPopMatrix() #Pop the current matrix stack defined in the rubiks cube
+
+    def setLock(self,state):
+        """Lock the mouse."""
+        self.lock = state
+        self.set_exclusive_mouse(state)
+        lock = False
+        mouse_lock = property(lambda self:self.lock,setLock)
 
     def on_mouse_motion(self,x,y,dx,dy):
         """Allow the player to change its parameters."""
@@ -68,11 +138,13 @@ class Window(pyglet.window.Window):
         glRotatef(-rotation[1],0,1,0) #Rotate the world position according to the view of the player
         glTranslatef(-position[0],-position[1],-position[2],) #Translate the world's position from the view of the player
 
-    def set3d(self):
+    def set3d2(self):
         """Set a 3d environment."""
         self.Projection()
         gluPerspective(self.fovy,self.aspect,self.zNear,self.zFar) #Set the camera
         #self.Model()
+
+    def set3d(self): self.Projection(); gluPerspective(70,self.width/self.height,0.05,1000); self.Model()
 
     def update(self,dt):
         """Update the player's view using time dt and knowning keys."""
@@ -88,9 +160,17 @@ class RubiksCube:
         self.colors=[RED,WHITE,GREEN,YELLOW,BLUE,ORANGE,BLACK]
         self.tex_coords = ('t2f',(0,0, 1,0, 1,1, 0,1, ))
         #self.tex_coords = BLUE
+        #self.side = self.get_tex('grass_side.png')
+        #self.blue = self.get_tex('blue.jpg')
         self.historic=[]
         self.rotating=0
         self.permutations=[]
+
+    def get_tex(self,file):
+        tex = pyglet.image.load(file).texture
+        glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST)
+        glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST)
+        return pyglet.graphics.TextureGroup(tex)
 
     def generate(self):
         """Create all the outside cubes with their faces colors."""
@@ -135,14 +215,37 @@ class RubiksCube:
 
     def drawCube(self,p1,p2,texture=None):
         """Draw a cube given its extremities."""
+        #texture=(0,1,1,1)
+        #texture=glColor(0,1,1,1)
+        texture=pyglet.graphics.OrderedGroup(1)
         x,y,z=p1
         X,Y,Z=p2
-        self.batch.add(4,GL_QUADS,texture,('v3f',(x,y,z, x,y,Z, x,Y,Z, x,Y,z, )),self.tex_coords)
-        self.batch.add(4,GL_QUADS,texture,('v3f',(X,y,Z, X,y,z, X,Y,z, X,Y,Z, )),self.tex_coords)
+        self.batch.add(4,GL_QUADS,self.side,('v3f',(x,y,z, x,y,Z, x,Y,Z, x,Y,z, )),self.tex_coords)
+        self.batch.add(4,GL_QUADS,self.blue,('v3f',(X,y,Z, X,y,z, X,Y,z, X,Y,Z, )),self.tex_coords)
         self.batch.add(4,GL_QUADS,texture,('v3f',(x,y,z, X,y,z, X,y,Z, x,y,Z, )),self.tex_coords)
         self.batch.add(4,GL_QUADS,texture,('v3f',(x,Y,Z, X,Y,Z, X,Y,z, x,Y,z, )),self.tex_coords)
         self.batch.add(4,GL_QUADS,texture,('v3f',(X,y,z, x,y,z, x,Y,z, X,Y,z, )),self.tex_coords)
         self.batch.add(4,GL_QUADS,texture,('v3f',(x,y,Z, X,y,Z, X,Y,Z, x,Y,Z, )),self.tex_coords)
+
+    def drawCubes2(self,texture=None):
+        """Draw a cube given its extremities but without adding it to the batch, reducing efficiency."""
+        #texture=pyglet.graphicsOrderedGroup(1)
+        #px,py,pz=self.position
+        px,py,pz=[-self.n/2 for i in range(3)]
+        glBegin(GL_QUADS)
+        for s,surface in enumerate(surfaces):
+            x = 0
+            for vertex in surface:
+                vx,vy,vz=verticies[vertex]
+                x+=1
+                mx=x//9
+                my=x//3%3
+                mz=x%3
+                color=self.matrix[mx][my][mz][s]
+                if color:
+                    glColor3fv(color)
+                glVertex3fv((vx+px,vy+py,vz+pz))
+        glEnd()
 
 
     def drawCubes(self):
@@ -165,7 +268,7 @@ class RubiksCube:
 
     def draw(self):
         """Draw the batch."""
-        self.drawCubes()
+        self.drawCubes2()
         self.batch.draw()
 
     def __str__(self):
@@ -198,7 +301,7 @@ class Cube:
 
 
 class Player:
-    def __init__(self,position=(100,0,0),rotation=(0,0)):
+    def __init__(self,position=(-100,0,0),rotation=(0,0)):
         """Create a player."""
         self.position=list(position) #position of the player relative to the scene
         self.rotation=list(rotation) #rotation of the player's view relative to the scene
@@ -231,7 +334,9 @@ class Player:
 
 
 if __name__ == '__main__':
-    window=Window(width=1440,height=900,caption='Rubiks Cube',fullscreen=False)
+    width=900
+    height=600
+    window=Window(width=width,height=height,caption='Rubiks Cube',fullscreen=False)
     r,g,b,alpha=0,0,0,1 #Color of the background and transparency alpha, each component's value must be between 0 and 1
     glClearColor(r,g,b,alpha) #Apply the background
     #glEnable allows to change the parameters of the opengl interface
