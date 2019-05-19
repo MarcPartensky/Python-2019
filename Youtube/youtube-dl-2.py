@@ -21,7 +21,8 @@ ydl_opts = {
         '-ar', '16000'
     ],
     'prefer_ffmpeg': True,
-    'keepvideo': True
+    'keepvideo': False,
+    'ignoreerrors':True
 }
 
 #Main functions used
@@ -56,3 +57,4 @@ if __name__=="__main__":
 
     #Download them
     download(url,ydl_opts)
+    #clean()
