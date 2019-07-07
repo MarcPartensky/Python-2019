@@ -15,7 +15,7 @@ ydl_opts = {
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
-        'preferredquality': '192'
+        #'preferredquality': '192' #Makes no difference at all.
     }],
     'postprocessor_args': [
         '-ar', '16000'
@@ -46,14 +46,16 @@ def download(url,options):
 
 if __name__=="__main__":
     #Choose your directory
-    DIRECTORY='/Users/olivierpartensky/Videos/2019/Youtube/Downloads'
+    DIRECTORY='/Users/olivierpartensky/Videos/2019/Youtube/JJD'
     os.chdir(DIRECTORY)
     print(DIRECTORY)
 
     #Choose your musics
-    #jjd_ocean="https://www.youtube.com/watch?v=XGyrclIGB9E"
+    jjd_ocean="https://www.youtube.com/watch?v=XGyrclIGB9E"
+    url=jjd_ocean
     #playlist='https://www.youtube.com/playlist?list=UUMOgdURr7d8pOVlc-alkfRg'
-    url="https://www.youtube.com/playlist?list=UUMOgdURr7d8pOVlc-alkfRg"
+    #url="https://www.youtube.com/playlist?list=UUMOgdURr7d8pOVlc-alkfRg"
+    #url="https://www.youtube.com/playlist?list=UU9IdQzchnAAwsjQb6DCugPw"
 
     #Download them
     download(url,ydl_opts)

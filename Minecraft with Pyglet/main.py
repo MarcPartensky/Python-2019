@@ -1,7 +1,7 @@
 from pyglet.gl import *
 from pyglet.window import key
 import math
-
+import sys
 
 class Model:
 
