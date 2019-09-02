@@ -227,13 +227,13 @@ class Polynomial:
             extrema=[neglim]+old_extrema+[poslim]
             for i in range(len(extrema)-1):
                 if derivative(extrema[i])*derivative(extrema[i+1])<=0:
-                    new_extrema.append(derivative.gradientDescent(extrema[i],extrema[i+1]))
+                    new_extrema.append(derivative.TVI(extrema[i],extrema[i+1]))
             old_extrema=new_extrema[:]
         return new_extrema
 
 
 
-    def gradientDescent(self,xa,xb,precision=10e-10):
+    def TVI(self,xa,xb,precision=10e-10):
         """Return a float value x between a and b for which the polynomial canceled itself."""
         """Does that based on theoreme of intermediate value with dichotomy."""
         if self(xa)*self(xb)>0:

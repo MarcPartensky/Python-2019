@@ -1,14 +1,14 @@
 import socket
 import select
-import time
 
 HEADER_LENGTH=10
-IP="127.0.0.1"
+IP="172.16.0.27."
+#IP="86.242.99.166"
+#IP='192.168.1.11'
 IP=socket.gethostname()
-PORT=1238
-
-to=time.time()
-duration=20
+IP=''
+print(IP)
+PORT=1236
 
 
 server_socket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -33,11 +33,11 @@ def receive_message(client_socket):
     except:
         return False
 
-while time.time()-to<duration:
+while True:
     read_sockets,_,exception_sockets=select.select(sockets_list,[],sockets_list)
     for notified_socket in read_sockets:
         if notified_socket==server_socket:
-            client_socket,client_address=server_socket.accept()
+            client_socket,client_address=server_socket
 
             user = receive_message(client_socket)
             if user is False:
@@ -47,19 +47,20 @@ while time.time()-to<duration:
 
             clients[client_socket]=user
 
-            print(f"Server: Accepted new connection from {client_address[0]}:{client_address[1]} username: {user['data'].decode('utf-8')}")
+            print(f"Accepted new connection from {client_address[0]}:{client_address[1]} username: {user['data'].decode('utf-8')}")
 
         else:
             message=receive_message(notified_socket)
             if message is False:
-                print("Server: Closed connection from {}".format(clients[notified_socket]['data'].decode('utf-8')))
+                m=clients[notified_socket]['data'].decode('utf-8')
+                print("Closed connection from {}".format(m))
                 sockets_list.remove(notified_socket)
-                del clients[notified_socket]
+                del clients[notified_sockets]
                 continue
 
             user = clients[notified_socket]
 
-            print(f"Server: Received message from {user['data'].decode('utf-8')}: {message['data'].decode('utf-8')}")
+            print(f"Received message from {user['data'].decode('utf-8')}: {message['data'].decode('utf-8')}")
             for client_socket in clients:
                 if client_socket != notified_socket:
                     client_socket.send(user['header']+user['data']+message['header']+message['data'])
@@ -67,6 +68,3 @@ while time.time()-to<duration:
             for notified_socket in exception_sockets:
                 sockets_list.remove(notified_socket)
                 del clients[notified_socket]
-
-
-print("the server is done running")
