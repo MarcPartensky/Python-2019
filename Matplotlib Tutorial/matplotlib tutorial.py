@@ -9,8 +9,6 @@ import matplotlib.dates as mdates
 import sys
 print(sys.version)
 
-
-"""
 x=[1,2,3]
 y=[5,7,4]
 
@@ -92,7 +90,8 @@ plt.plot(x,y,label="loaded from file")
 x,y=np.loadtxt("text.txt",delimiter=",",unpack=True)
 
 plt.plot(x,y,label="loaded from file")
-"""
+
+#
 
 def bytespdate2num(fmt,encoding="utf-8"):
     strconverter=mdates.strpdate2num(fmt)
