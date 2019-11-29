@@ -2,6 +2,8 @@ from selenium import webdriver
 from PIL import Image
 import numpy as np
 import time
+import os
+
 
 url="https://patrickhlauke.github.io/recaptcha/"
 
@@ -28,7 +30,10 @@ def searchCaptcha(filename):
 
 
 def resolveCaptcha(url):
-    driver=webdriver.Chrome('/Users/olivierpartensky/Programs/Library/Selenium/chromedriver')
+    path = os.path.("/chromedriver")
+    # dir_path = os.path.dirname(os.path.realpath(__file__))
+    print(path)
+    driver=webdriver.Chrome(path)
     action=webdriver.common.action_chains.ActionChains(driver)
     driver.get(url)
     #action.move_by_offset(36,156)
