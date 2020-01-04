@@ -1,0 +1,3 @@
+count: 11
+url: https://www.youtube.com/playlist?list=PLUja9J5M1XReqoBal5IKog_PWz2Q_hZ7Y
+directory: /Users/marcpartensky/Downloads/Videos/2019/Youtube/Coding Music Compilation 

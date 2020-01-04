@@ -1,3 +1,0 @@
-count: 6
-url: https://www.youtube.com/watch?v=3QB71ZzkIXA
-directory: /Users/marcpartensky/Desktop/Musique Test VideoDownloader
